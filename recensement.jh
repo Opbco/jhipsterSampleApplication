@@ -1,0 +1,137 @@
+entity Region {
+	regionName String required
+}
+
+entity Department {
+	departmentName String required
+}
+
+entity Arrondissement {
+	ArrondissementName String required
+}
+
+// an ignored comment
+/** not an ignored comment */
+entity Location {
+	streetAddress String,
+	postalCode String,
+	city String,
+    latitude Integer,
+    longitude Integer,
+    zone Integer
+}
+
+entity StructureCentrale {
+	categorieStructure String required
+    localisation String
+}
+
+entity Structure {
+	typeStructure String required,
+	nameStructure String required
+}
+
+entity Etablissement {
+	enseignementStructure String,
+	nameStructure String required,
+    nbeleve Integer   
+}
+
+entity Classe {
+	niveauClasse String required,
+	langueEnseignement String required
+}
+
+entity Specialite {
+	nameSpecialite String required
+}
+
+entity ClasseSpecialite {
+	nbSalle Integer required
+}
+/**
+ * The Employee entity.
+ */
+entity Personnel {
+	/**
+	* The firstname attribute.
+	*/
+    matricule String required,
+	firstName String required,
+	lastName String required,
+	email String,
+	phoneNumber String required,
+	birthDate Instant required,
+	placeBirth String required,
+	grade String required,
+    specialite String,
+    situationMatrimoniale String,
+    nbEnfant Integer,
+    nbEnfantScolarise Integer,
+    indiceActuel Long,
+    dateIntegration Instant required,
+    nomConjoint String,
+    fonctionConjoint String,
+    picturePath String required
+}
+
+entity Parcours {
+	datePriseService Instant required,
+	fonction String required,
+	numeroArrete String required,
+    dateArrete Instant required
+}
+
+relationship OneToOne {
+	Location{etablissement} to Etablissement 
+}
+
+
+relationship ManyToMany {
+	Personnel{originaireResidenceC} to Arrondissement
+}
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+	Personnel{parcours} to Parcours,
+	/**
+	* A relationship
+	*/
+    Region{departement} to Department,
+    
+	Department{arrondissement} to Arrondissement,
+    
+    Arrondissement{location} to Location,
+    
+    Etablissement{classe} to Classe,
+    
+    Etablissement{parcours} to Parcours,
+    
+    Structure{parcours} to Parcours,
+    
+    StructureCentrale{Structure} to Structure,
+	/**
+	* Another side of the same relationship
+	*/
+	Structure{sousStructure} to Structure
+}
+/**
+ * relationship ManyToOne {
+ *    Peronnel{originaireDe} to Arrondissement
+ * }
+*/
+// defining multiple oneToOne relationships
+relationship OneToOne {
+	Classe{classe} to ClasseSpecialite,
+	Specialite{specialite} to ClasseSpecialite
+}
+// Set pagination options
+paginate Etablissement, Structure, Employee with infinite-scroll
+paginate Parcours with pagination
+
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl except Personnel, Parcours
+// Set an angular suffix
+angularSuffix * with mySuffix
